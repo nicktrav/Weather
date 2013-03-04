@@ -29,6 +29,24 @@ def forecast():
 
 	return
 
+def current():
+	url = 'ftp://ftp2.bom.gov.au/anon/gen/fwo/IDW14199.xml'
+	xml_feed = u.urlopen(url)
+
+	tree = ET.parse(xml_feed)
+	root = tree.getroot()
+
+	fremantle = root.findall("./forecast/*[@aac='WA_PT028']/*")
+
+	now = fremantle[0]
+	now_temp = now.find("./*[@type='air_temperature_maximum']").text
+	now_precis = now.find("./*[@type='precis']").text
+
+	print 'Temperature now: %s' % now_temp
+	print 'Precis: %s' % now_precis
+
+	return	
+
 def main():
 
 
@@ -40,6 +58,8 @@ def main():
 
 	if args.forecast:
 		forecast()
+	elif args.current:
+		current()
 
 	return
 
