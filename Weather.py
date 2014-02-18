@@ -1,4 +1,6 @@
 import urllib as u
+import urllib2
+import json
 import xml.etree.ElementTree as ET
 import dateutil.parser
 import datetime
@@ -38,26 +40,24 @@ def forecast():
 	return
 
 def current():
-	url = 'ftp://ftp2.bom.gov.au/anon/gen/fwo/IDW14199.xml'
-	xml_feed = u.urlopen(url)
+	url = 'http://www.bom.gov.au/fwo/IDW60901/IDW60901.94614.json'
 
-	tree = ET.parse(xml_feed)
-	root = tree.getroot()
+	resp = urllib2.urlopen(url)
+	data = json.loads(resp.read())
 
-	location = root.findall("./forecast/*[@aac='WA_PT060']/*")
-	current_forecast = location[0] # the first item is the current forecast period
+	latest_ob = data['observations']['data'][0]
 
-	forecast_items = {'Outlook': None, 'Maximum': None, 'Minimum': None}
+	location = latest_ob['name']
+	datetime_full = latest_ob['local_date_time_full']
+	date = datetime_full[6:8] + '/' + datetime_full[4:6] + '/' + datetime_full[0:4] 
+	time = datetime_full[8:10] + ':' + datetime_full[10:12]
 
-	getAttribute(current_forecast, 'air_temperature_minimum')
 
-	forecast_items['Minimum'] = getAttribute(current_forecast, 'air_temperature_minimum')
-	forecast_items['Maximum'] = getAttribute(current_forecast, 'air_temperature_maximum')
-	forecast_items['Outlook'] = getAttribute(current_forecast, 'precis')
-
-	if forecast_items['Minimum'] != None: print 'Minimum: %f' % forecast_items['Minimum']
-	if forecast_items['Maximum'] != None: print 'Maximum: %f' % forecast_items['Maximum']
-	if forecast_items['Outlook'] != None: print 'Outlook: %s' % forecast_items['Outlook']
+	print '\nLatest observations for %s (as of %s local time):' % (location, time)
+	print '\tAir temp: %.1fC' % latest_ob['air_temp']
+	print '\tApparent temp: %.1fC' % latest_ob['apparent_t']
+	print '\tWind speed: %d km/h' % latest_ob['wind_spd_kmh']
+	print '\tWind direction: %s' % latest_ob['wind_dir']
 
 	return	
 
