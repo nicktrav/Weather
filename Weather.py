@@ -68,6 +68,31 @@ def format_time_full(s):
 
 	return (date, time)
 
+def past():
+	'''Weather observations for the past 24 hours'''
+	# the lastest observations for Swanbourne
+	url = 'http://www.bom.gov.au/fwo/IDW60901/IDW60901.94614.json'
+
+	# Get the json
+	resp = urllib2.urlopen(url)
+	data = json.loads(resp.read())	
+
+	# get all of the observations available
+	location = data['observations']['header'][0]['name']
+	observations = data['observations']['data']
+	latest_time = format_time_full(observations[0]['local_date_time_full'])[1]
+
+	print '\nLatest observations for %s (as of %s local time)' % (location, latest_time)
+	template = "{0:^15}|{1:^10}|{2:^10}"
+	print template.format("Date", "Time", "Air temp.")
+	for obs in observations:
+		(date, time) = format_time_full(obs['local_date_time_full'])
+		air_temp = obs['air_temp']
+		print template.format(*(date, time, air_temp))
+	
+	return
+
+
 def main():
 
 	parser = argparse.ArgumentParser()
@@ -80,8 +105,11 @@ def main():
 		forecast()
 	elif args.current:
 		current()
+	elif args.past:
+		past()
 	else:
 		parser.print_help()
+	
 	return
 
 if __name__ == '__main__':
