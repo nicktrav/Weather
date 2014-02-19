@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import urllib as u
 import urllib2
 import json
@@ -52,7 +53,6 @@ def current():
 	date = datetime_full[6:8] + '/' + datetime_full[4:6] + '/' + datetime_full[0:4] 
 	time = datetime_full[8:10] + ':' + datetime_full[10:12]
 
-
 	print '\nLatest observations for %s (as of %s local time):' % (location, time)
 	print '\tAir temp: %.1fC' % latest_ob['air_temp']
 	print '\tApparent temp: %.1fC' % latest_ob['apparent_t']
@@ -60,6 +60,13 @@ def current():
 	print '\tWind direction: %s' % latest_ob['wind_dir']
 
 	return	
+
+def format_time_full(s):
+	'''Format a BOM full time string to a time'''
+	date = s[0:4] + '-' + s[4:6] + '-' + s[6:8] 
+	time = s[8:10] + ':' + s[10:12]
+
+	return (date, time)
 
 def main():
 
