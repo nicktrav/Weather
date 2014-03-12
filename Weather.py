@@ -85,7 +85,7 @@ def past():
 	print '\nLatest observations for %s (as of %s local time)' % (location, latest_time)
 	template = "{0:^15}|{1:^10}|{2:^10}"
 	print template.format("Date", "Time", "Air temp.")
-	for obs in observations:
+	for obs in observations[::-1]:
 		(date, time) = format_time_full(obs['local_date_time_full'])
 		air_temp = obs['air_temp']
 		print template.format(*(date, time, air_temp))
